@@ -22,5 +22,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::apiResource('users', UserController::class);
 
-Route::get('/store-customers', [StoreCustomerController::class, 'getCustomers'])->name('api.store.customers');
 Route::post('/handle-customers', [StoreCustomerController::class, 'handleCustomers'])->name('api.handle.customers');

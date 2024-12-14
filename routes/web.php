@@ -24,5 +24,3 @@ Route::get('/', [IndexController::class, 'index'])->name('home');
 Route::get('/hello', [IndexController::class, 'show']);
 
 Route::get('/customers', [CustomerController::class, 'index'])->name('customer.index');
-
-Route::get('/get-store-customers', [StoreCustomerController::class, 'handleCustomers']);

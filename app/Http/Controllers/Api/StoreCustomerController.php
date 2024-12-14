@@ -7,8 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Trigger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StoreCustomerController extends Controller
 {
@@ -33,9 +31,13 @@ class StoreCustomerController extends Controller
             $trigger->event = $data->event ?? $payload['data']['event'];
             $trigger->save();
 
-            return ['msg' => 'trigger save successful', 'status' => 200];
+            return response()->json([
+                'msg' => 'Trigger save successfully'
+            ], 200);
         } else {
-            return ['msg' => 'failed to get data', 'status' => 404];
+            return response()->json([
+                'msg' => 'Error happen'
+            ], 400);
         }
     }
 
@@ -53,50 +55,12 @@ class StoreCustomerController extends Controller
             $trigger->save();
 
             return response()->json([
-                'msg' => 'successful get customers'
+                'msg' => 'Successful get customers'
             ], 200);
         } else {
             return response()->json([
-                'msg' => 'no data founded'
-            ], 200);
+                'msg' => 'No data founded'
+            ], 204);
         }
-
-
-        // $customers = [
-        //     ['name' => 'amgad', 'email' => 'amgad@gmail.com', 'phone_number' => '777444555'],
-        //     ['name' => 'ali', 'email' => 'ali@gmail.com', 'phone_number' => '777888999'],
-        //     ['name' => 'ahmed', 'email' => 'ahmed@gmail.com', 'phone_number' => '777222333'],
-        //     ['name' => 'arwa', 'email' => 'arwa@gmail.com', 'phone_number' => '777555444'],
-        // ];
-
-        // $customers = $data->data;
-        // \Log::info($customers);
-        // session()->put(['customers' => $customers]);
-
-        // return new StreamedResponse(function () use($customers) {
-        //     while (true) {
-
-        //         $data = session('customers', $customers);
-
-        //         // sleep(7);
-
-        //         if ($data) {
-        //             echo "data: " . json_encode([
-        //                 'time' => now(),
-        //                 'customers' => $data
-        //             ]) . "\n\n";
-        //             ob_flush();
-        //             flush();
-        //             break;
-        //         }
-
-        //         // Sleep to limit frequency (e.g., send every second)
-        //         // sleep(1);
-        //     }
-        // }, 200, [
-        //     'Content-Type' => 'text/event-stream',
-        //     'Cache-Control' => 'no-cache',
-        //     'Connection' => 'keep-alive',
-        // ]);
     }
 }

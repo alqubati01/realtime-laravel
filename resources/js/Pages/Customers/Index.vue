@@ -19,7 +19,16 @@
             <h4 class="card-title pt-3">{{ message }}</h4>
           </div>
           <div class="card-body">
-            <CustomerList :customers="customers" />
+            <CustomerList :customers="paginatedData" />
+          </div>
+          <div class="card-footer">
+            <nav aria-label="Page navigation example">
+              <ul class="pagination">
+                <li class="page-item"><a class="page-link" type="button" @click="prevPage" :disabled="currentPage === 1">Previous</a></li>
+                <!-- <span>Page {{ currentPage }} of {{ totalPages }}</span> -->
+                <li class="page-item"><a class="page-link" type="button" @click="nextPage" :disabled="currentPage === totalPages">Next</a></li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>
@@ -39,47 +48,49 @@ export default {
   },
   props: {
     message: Object,
-    customersData: Array,
     failedData: Boolean,
+    itemsPerPage: {
+      type: Number,
+      default: 5,
+    },
   },
   data() {
     return {
-      loading: true,
-      customers: [],
       layout: undefined,
-      serverTime: '',
+      loading: true,
       failed: false,
+      customers: [],
+      totalCustomers: 0,
+      currentPage: 1,
       timeout: null,
     }
   },
   mounted() {
-    // this.timeout = setTimeout(() => {
-    //   if (this.loading) {
-    //     this.failed = true;
-    //   }
-    // }, 10000);
+    this.timeout = setTimeout(() => {
+      if (this.loading) {
+        this.failed = true;
+      }
+    }, 10000);
 
-    this.listenForCustomersReceived()
-    // if (this.$page.props.failedData === true) {
-    //   this.failed = true
-    // } else {
-    //   // this.startSSE();
-
-    //   window.Echo.channel('customers')
-    //     .listen('.customers.received', (e) => {
-    //         console.log("Customers received: ", e)
-    //     })
-    // }
-    // if (this.$page.props.customersData.length > 0) {
-    //   this.loading = false
-    //   this.customers = this.$page.props.customersData
-    // } else {
-    //   this.startSSE();
-    // }
+    if (this.$page.props.failedData === true) {
+      this.failed = true
+    } else {
+      this.listenForCustomersReceived()
+    }
   },
   beforeUnmount() {
     window.Echo.leaveChannel("customers");
-    // clearTimeout(this.timeout);
+    clearTimeout(this.timeout);
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.totalCustomers / this.itemsPerPage);
+    },
+    paginatedData() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.customers.slice(start, end);
+    },
   },
   methods: {
     listenForCustomersReceived() {
@@ -87,35 +98,20 @@ export default {
         .listen('CustomerReceived', (event) => {
           this.loading = false;
           this.customers = event.customers;
-          // clearTimeout(this.timeout);
+          this.totalCustomers = event.customers.length;
+          clearTimeout(this.timeout);
         });
     },
-    // startSSE() {
-    //   const eventSource = new EventSource('/get-store-customers');
-
-    //   const timeout = setTimeout(() => {
-    //       this.loading = false;
-    //       this.failed = true;
-    //       eventSource.close();
-    //     }, 10000);
-
-    //   eventSource.onmessage = (event) => {
-    //     clearTimeout(timeout);
-    //     const data = JSON.parse(event.data);
-    //     this.serverTime = data.time;
-    //     this.customers = data.customers;
-    //     this.loading = false;
-    //     eventSource.close();
-    //   };
-
-    //   eventSource.onerror = () => {
-    //     clearTimeout(timeout);
-    //     this.loading = false;
-    //     this.failed = true;
-    //     console.error("SSE connection failed.");
-    //     eventSource.close();
-    //   };
-    // },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
   },
 }
 </script>

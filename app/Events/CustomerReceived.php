@@ -9,7 +9,6 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
 class CustomerReceived implements ShouldBroadcast
 {
@@ -32,10 +31,6 @@ class CustomerReceived implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        // Log::debug("Customers Received {$this->customers}");
-        // Log::debug(json_encode($this->customers));
-        
-
         return [
             new Channel('customers'),
         ];

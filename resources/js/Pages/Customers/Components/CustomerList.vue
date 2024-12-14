@@ -4,6 +4,7 @@
       <table class="table table-hover">
         <thead>
           <tr>
+            <th>id</th>
             <th>User</th>
             <th>Email</th>
             <th>Phone Number</th>
@@ -15,6 +16,7 @@
             v-for="(customer, index) in customers"
             :key="index"
           >
+          <td>{{ index + 1 }}</td>
           <td>{{ customer.name }}</td>
           <td>{{ customer.email }}</td>
           <td>{{ customer.phone_number }}</td>
